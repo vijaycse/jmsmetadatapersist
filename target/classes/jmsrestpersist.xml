@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.5.1"
+	xmlns:management="http://www.mulesoft.org/schema/mule/management"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/management http://www.mulesoft.org/schema/mule/management/3.1/mule-management.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	<!-- <custom-agent name="jolokia-agent" class="org.jolokia.mule.JolokiaMuleAgent">
+		<spring:property name="port" value="8161" />
+		<spring:property name="user" value="admin" />
+		<spring:property name="password" value="admin" />
+	</custom-agent>
+	<management:jmx-server /> -->
+	
+	<flow name="jmsrestpersistFlow1" doc:name="jmsrestpersistFlow1">
+		<http:inbound-endpoint exchange-pattern="one-way"
+			host="localhost" port="8081" doc:name="HTTP" />
+		<echo-component doc:name="Echo" />
+		<message-filter doc:name="Filter favicon">
+			<not-filter>
+				<wildcard-filter pattern="/favicon.ico"
+					caseSensitive="true" />
+			</not-filter>
+		</message-filter>
+        <component doc:name="MuleClient- GetQueueDetails" class="com.fiverr.jmx.rest.api.MuleClientJolokiaAPI"/>
+        <json:json-to-object-transformer returnClass="java.util.HashMap" doc:name="JSON to Object"/>
+        <component class="com.fiverr.jmx.rest.api.JMSMQDetailsList" doc:name="DataSynthethizer- GetQueueTypeDetails"/>
+        <component doc:name="MuleClient - GetQueueAttrDetails" class="com.fiverr.jmx.rest.api.MuleClientJolokiaAPI"/>
+		<echo-component doc:name="Echo" />
+        <file:outbound-endpoint path="C:\Users\vijay\Desktop" responseTimeout="10000" doc:name="queue_details"/>
+	</flow>
+</mule>
