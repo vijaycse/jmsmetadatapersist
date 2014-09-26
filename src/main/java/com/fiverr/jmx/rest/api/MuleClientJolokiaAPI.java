@@ -52,9 +52,9 @@ public class MuleClientJolokiaAPI{
 	 * @return String
 	 */
 	// TODO: clean up the method code and modularize this and create a sub flow to do this instead of this two java comp
-	public String testMuleClientQueueAttrDetails(Map<String, LinkedHashMap<String, String>> payload){
-		return getJolokiaQueueDetails(payload);
-	}
+	//public List<String> testMuleClientQueueAttrDetails(Map<String, LinkedHashMap<String, String>> payload){
+	//	return getJolokiaQueueDetails(payload);
+	//}
 
 
 	/***
@@ -77,11 +77,12 @@ public class MuleClientJolokiaAPI{
 	 * @param payload
 	 * @return
 	 */
-	private String getJolokiaQueueDetails(Map<String, LinkedHashMap<String, String>> payload) {
+	private List<String> getJolokiaQueueDetails(Map<String, LinkedHashMap<String, String>> payload) {
 		client =   muleContext.getClient();
 		MuleMessage result = null;
 		String jsonPayload="";
-		List<QueueConfigDetails> queueDetailList  = new ArrayList<QueueConfigDetails>();
+		//List<QueueConfigDetails> queueDetailList  = new ArrayList<QueueConfigDetails>();
+		List<String> queueDetailList  = new ArrayList<String>();
 		for(Map.Entry<String, LinkedHashMap<String, String>> entrySet :  payload.entrySet()){
 			LinkedHashMap<String,String> queueTypeDetails = (LinkedHashMap) entrySet.getValue();
 			String queueName = queueTypeDetails.get("destinationName");
@@ -92,14 +93,16 @@ public class MuleClientJolokiaAPI{
 				result = client.send("http://localhost:8161/api/jolokia?maxDepth=7&maxCollectionSize=500&ignoreErrors=true&canonicalNaming=false", 
 						jsonPayload, setHTTPHeaders());
 				System.out.println(" payload " +result.getPayloadAsString() );
-				queueDetailList.add(getJsontoQueueConfigDetails(result.getPayloadAsString()));
+				//queueDetailList.add(getJsontoQueueConfigDetails(result.getPayloadAsString()));
+				queueDetailList.add((result.getPayloadAsString()));
 			} catch (MuleException e) {
 				System.out.println("mule exception in queue details fetch " + e.getMessage());
 			} catch (Exception e) {
 				System.out.println("exception in queue details fetch  " + e.getMessage());
 			}
 		}
-		return getStringofQueueConfigDetails(queueDetailList);
+		//return getStringofQueueConfigDetails(queueDetailList);
+		return (queueDetailList);
 	}
 
 	/***
